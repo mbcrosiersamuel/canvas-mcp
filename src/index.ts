@@ -393,13 +393,13 @@ server.tool(
   "search_assignments",
   "Searches for assignments across all courses based on title, description, due dates, and course filters.",
   {
-    query: z.string().optional().default("").describe("Search term to find in assignment titles or descriptions"),
+    query: z.string().optional().describe("Search term to find in assignment titles or descriptions. Use '*' as wildcard to match all. Optional if other filters like dates are specified."),
     dueBefore: z.string().optional().describe("Only include assignments due before this date (YYYY-MM-DD)"),
     dueAfter: z.string().optional().describe("Only include assignments due after this date (YYYY-MM-DD)"),
     includeCompleted: z.boolean().default(false).describe("Include assignments from completed courses"),
     courseId: z.string().or(z.number()).optional().describe("Optional: Limit search to specific course ID"),
   },
-  async ({ query = "", dueBefore, dueAfter, includeCompleted, courseId }) => {
+  async ({ query, dueBefore, dueAfter, includeCompleted, courseId }) => {
     try {
       let courses: CanvasCourse[];
       
@@ -463,11 +463,14 @@ server.tool(
           const assignments = await canvasApiRequest<CanvasAssignment[]>(assignmentsUrl);
           console.error(`Found ${assignments.length} assignments in course ${course.id}`); // Debug logging
           
-          // Filter by search terms if query is provided
-          const searchTerms = query.toLowerCase().split(/\s+/).filter(term => term.length > 0);
-          const matchingAssignments = searchTerms.length > 0 ? 
+          // Filter by search terms if query is provided (and not a wildcard)
+          // Treat "*" or empty/undefined query as wildcard (match all)
+          const isWildcard = !query || query.trim() === "" || query.trim() === "*";
+          const matchingAssignments = isWildcard ? 
+            assignments : 
             assignments.filter((assignment) => {
               // Search in title and description
+              const searchTerms = query.toLowerCase().split(/\s+/).filter(term => term.length > 0);
               const titleMatch = searchTerms.some(term => 
                 assignment.name.toLowerCase().includes(term)
               );
@@ -478,7 +481,7 @@ server.tool(
                 ) : false;
               
               return titleMatch || descriptionMatch;
-            }) : assignments;
+            });
           
           // Double-check date range (in case API filter wasn't exact)
           const dateFilteredAssignments = matchingAssignments.filter(assignment => {
@@ -522,7 +525,9 @@ server.tool(
         if (dueAfter) dateRange.push(`after ${dueAfter}`);
         if (dueBefore) dateRange.push(`before ${dueBefore}`);
         const dateStr = dateRange.length > 0 ? ` due ${dateRange.join(' and ')}` : '';
-        const queryStr = query ? ` matching "${query}"` : '';
+        // Don't show "*" in the query string - it's just a wildcard indicator
+        const isWildcard = !query || query.trim() === "" || query.trim() === "*";
+        const queryStr = (query && !isWildcard) ? ` matching "${query}"` : '';
         
         return {
           content: [{ 
@@ -546,7 +551,9 @@ server.tool(
       if (dueAfter) dateRange.push(`after ${dueAfter}`);
       if (dueBefore) dateRange.push(`before ${dueBefore}`);
       const dateStr = dateRange.length > 0 ? ` due ${dateRange.join(' and ')}` : '';
-      const queryStr = query ? ` matching "${query}"` : '';
+      // Don't show "*" in the query string - it's just a wildcard indicator
+      const isWildcard = !query || query.trim() === "" || query.trim() === "*";
+      const queryStr = (query && !isWildcard) ? ` matching "${query}"` : '';
 
       return {
         content: [{ 
