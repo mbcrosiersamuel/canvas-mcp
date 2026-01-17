@@ -401,6 +401,10 @@ server.tool(
   },
   async ({ query, dueBefore, dueAfter, includeCompleted, courseId }) => {
     try {
+      // Normalize query: treat undefined, empty string, or "*" as wildcard
+      const normalizedQuery = query?.trim() || "";
+      const isWildcard = normalizedQuery === "" || normalizedQuery === "*";
+      
       let courses: CanvasCourse[];
       
       // If courseId is provided, only search that course
@@ -464,13 +468,11 @@ server.tool(
           console.error(`Found ${assignments.length} assignments in course ${course.id}`); // Debug logging
           
           // Filter by search terms if query is provided (and not a wildcard)
-          // Treat "*" or empty/undefined query as wildcard (match all)
-          const isWildcard = !query || query.trim() === "" || query.trim() === "*";
           const matchingAssignments = isWildcard ? 
             assignments : 
             assignments.filter((assignment) => {
               // Search in title and description
-              const searchTerms = query.toLowerCase().split(/\s+/).filter(term => term.length > 0);
+              const searchTerms = normalizedQuery.toLowerCase().split(/\s+/).filter(term => term.length > 0);
               const titleMatch = searchTerms.some(term => 
                 assignment.name.toLowerCase().includes(term)
               );
@@ -525,9 +527,8 @@ server.tool(
         if (dueAfter) dateRange.push(`after ${dueAfter}`);
         if (dueBefore) dateRange.push(`before ${dueBefore}`);
         const dateStr = dateRange.length > 0 ? ` due ${dateRange.join(' and ')}` : '';
-        // Don't show "*" in the query string - it's just a wildcard indicator
-        const isWildcard = !query || query.trim() === "" || query.trim() === "*";
-        const queryStr = (query && !isWildcard) ? ` matching "${query}"` : '';
+        // Don't show "*" or empty query in the query string - it's just a wildcard indicator
+        const queryStr = !isWildcard ? ` matching "${normalizedQuery}"` : '';
         
         return {
           content: [{ 
@@ -551,9 +552,8 @@ server.tool(
       if (dueAfter) dateRange.push(`after ${dueAfter}`);
       if (dueBefore) dateRange.push(`before ${dueBefore}`);
       const dateStr = dateRange.length > 0 ? ` due ${dateRange.join(' and ')}` : '';
-      // Don't show "*" in the query string - it's just a wildcard indicator
-      const isWildcard = !query || query.trim() === "" || query.trim() === "*";
-      const queryStr = (query && !isWildcard) ? ` matching "${query}"` : '';
+      // Don't show "*" or empty query in the query string - it's just a wildcard indicator
+      const queryStr = !isWildcard ? ` matching "${normalizedQuery}"` : '';
 
       return {
         content: [{ 

@@ -1,68 +1,57 @@
 {
-  "dxt_version": "0.1",
+  "manifest_version": "0.2",
   "name": "canvas-mcp-server",
-  "display_name": "Canvas (Instructure) MCP Server",
   "version": "1.0.0",
   "description": "MCP server for Canvas LMS integration",
   "author": {
-    "name": "MB Crosier"
+    "name": "MB Samuel"
   },
-  "screenshots": [
-    "images/due-dates.png",
-    "images/assignment-list.png"
-  ],
   "server": {
     "type": "node",
-    "entry_point": "dist/index.js",
+    "entry_point": "server/index.js",
     "mcp_config": {
       "command": "node",
       "args": [
-        "${__dirname}/dist/index.js"
+        "${__dirname}/server/index.js"
       ],
       "env": {
-        "CANVAS_API_TOKEN": "${user_config.canvas_api_token}",
-        "CANVAS_DOMAIN": "${user_config.canvas_domain}"
+        "CANVAS_API_TOKEN": "${user_config.CANVAS_API_TOKEN}",
+        "CANVAS_DOMAIN": "${user_config.CANVAS_DOMAIN}"
       }
     }
-  },
-  "keywords": [
-    "canvas",
-    "instructure",
-    "lms",
-    "assignments"
-  ],
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mbcrosier/canvas-mcp"
   },
   "tools": [
     {
       "name": "list_courses",
-      "description": "Lists all courses you are enrolled in, with options to filter by active, completed, or all courses."
+      "description": "Shows all active courses by default. Use flags to show completed or all courses"
     },
     {
-      "name": "search_assignments",
-      "description": "Searches for assignments across all courses based on title, description, due dates, and course filters."
+      "name": "search_assignments"
     },
     {
-      "name": "get_assignment",
-      "description": "Retrieves detailed information about a specific assignment, including its description, submission requirements, and embedded links."
+      "name": "get_assignment"
     }
   ],
   "user_config": {
-    "canvas_api_token": {
+    "CANVAS_API_TOKEN": {
       "type": "string",
       "title": "Canvas API Token",
-      "description": "Your Canvas API access token. You can generate this in your Canvas account settings.",
-      "sensitive": true,
-      "required": true
+      "description": "Your API Token from Canvas",
+      "required": true,
+      "sensitive": true
     },
-    "canvas_domain": {
+    "CANVAS_DOMAIN": {
       "type": "string",
       "title": "Canvas Domain",
-      "description": "Your Canvas institution's domain, e.g., hbs.instructure.edu",
-      "required": true
+      "description": "Your canvas domain, e.g. canvas-domain.instructure.com",
+      "required": true,
+      "sensitive": false
     }
-  }
+  },
+  "keywords": [
+    "canvas",
+    "lms",
+    "instructure"
+  ],
+  "license": "MIT"
 }
