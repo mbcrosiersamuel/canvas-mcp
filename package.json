@@ -2,11 +2,12 @@
     "name": "canvas-mcp-server",
     "version": "1.0.0",
     "description": "MCP server for Canvas LMS integration",
-    "main": "dist/index.js",
+    "main": "server/index.js",
     "type": "module",
     "scripts": {
       "build": "tsc",
-      "start": "node dist/index.js"
+      "start": "node server/index.js",
+      "package": "npm run build && npx -y @anthropic-ai/mcpb pack"
     },
     "dependencies": {
       "@modelcontextprotocol/sdk": "^1.8.0",

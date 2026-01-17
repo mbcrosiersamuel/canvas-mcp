@@ -35,19 +35,76 @@ It allows you to retrieve, search, and summarize course and assignment informati
 
 ## Prerequisites
 
-- Node.js
+- An MCP-compatible client (Claude Desktop, Cursor, etc.)
 - Canvas LMS account
 - Canvas API Token
 - Canvas Domain
 
-## Environment Setup
+## Configuration
 
-Set the following environment variables:
+When you install the MCP bundle, you'll be prompted to configure:
 
-- `CANVAS_API_TOKEN`: Your Canvas API access token (see instructions below)
-- `CANVAS_DOMAIN`: Your Canvas institution's domain (e.g., `canvas.youruniversity.edu`)
+- **Canvas API Token**: Your Canvas API access token (see instructions below)
+- **Canvas Domain**: Your Canvas institution's domain (e.g., `canvas.youruniversity.edu`)
 
-#### How to Get Your Canvas API Token
+These values are stored securely by your MCP client and are not exposed in your configuration files.
+
+### Security Note
+
+Keep your Canvas API token confidential. The bundle marks the token as sensitive, so it will be stored securely by your MCP client.
+
+## Installation
+
+This MCP server is distributed as an MCP bundle (`.mcpb` file) for easy installation.
+
+### Option 1: Install from Bundle File (Recommended)
+
+1. **Download the bundle**
+
+   Download the `canvas-mcp.mcpb` file from the [releases page](https://github.com/mbcrosiersamuel/canvas-mcp/releases) or build it yourself (see Option 2).
+
+2. **Install in your MCP client**
+
+   For **Claude Desktop**:
+   - Open Claude Desktop settings
+   - Navigate to the MCP servers section
+   - Click "Add Server" or "Install from Bundle"
+   - Select the `canvas-mcp.mcpb` file
+   - When prompted, enter your Canvas API token and domain
+
+   For **Cursor**:
+   - Open Cursor settings
+   - Navigate to MCP configuration
+   - Install the bundle file
+   - Configure your Canvas API token and domain when prompted
+
+3. **Configure your credentials**
+
+   When you first install the bundle, you'll be prompted to enter:
+   - **Canvas API Token**: Your Canvas API access token (see instructions below)
+   - **Canvas Domain**: Your Canvas institution's domain (e.g., `canvas.youruniversity.edu`)
+
+### Option 2: Build from Source
+
+If you want to build the bundle yourself:
+
+1. **Clone the repository and install dependencies**
+
+   ```bash
+   git clone https://github.com/mbcrosiersamuel/canvas-mcp.git
+   cd canvas-mcp
+   npm install
+   ```
+
+2. **Build the bundle**
+
+   ```bash
+   npm run package
+   ```
+
+   This will create a `canvas-mcp.mcpb` file that you can then install using Option 1.
+
+### How to Get Your Canvas API Token
 
 1. Log into Canvas
 2. Go to Account > Settings
@@ -56,64 +113,6 @@ Set the following environment variables:
 5. Copy the generated token
 
 For more details, see [these instructions from Canvas](https://community.canvaslms.com/t5/Canvas-Basics-Guide/How-do-I-manage-API-access-tokens-in-my-user-account/ta-p/615312).
-
-### Security Note
-
-Keep your `CANVAS_API_TOKEN` confidential. Do not commit it to version control.
-
-## Installation
-
-1.  **Clone the repository and install dependencies**
-
-  Clone the repository
- 
-   ```bash
-   git clone https://github.com/mbcrosiersamuel/canvas-mcp.git
-   cd canvas-mcp
-   ```
-
-   Install dependencies. If this throws an error, make sure you have [node installed](https://nodejs.org/en).
-
-   ```bash
-   npm install
-   ```
-
-2. **Connect to the MCP server**
-
-   Copy the below json with the appropriate {{PATH}} values:
-
-   ```json
-   {
-     "mcpServers": {
-       "canvas": {
-         "command": "node", 
-         "args": ["/absolute/path/to/canvas-mcp/src/index.ts"], // cd into the src repo, run `pwd` and enter the output here
-         "env": {
-            "CANVAS_API_TOKEN": "your_api_token_here",
-            "CANVAS_DOMAIN": "myschool.instructure.com"
-          }
-       }
-     }
-   }
-   ```
-
-   For **Claude**, save this as `claude_desktop_config.json` in your Claude Desktop configuration directory at:
-
-   ```
-   ~/Library/Application Support/Claude/claude_desktop_config.json
-   ```
-
-   For **Cursor**, save this as `mcp.json` in your Cursor configuration directory at:
-
-   ```
-   ~/.cursor/mcp.json
-   ```
-
-3. **Restart Claude Desktop / Cursor**
-
-   Open Claude Desktop and you should now see Canvas as an available integration.
-
-   Or restart Cursor.
 
 
 ## MCP Tools
