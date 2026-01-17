@@ -68,7 +68,7 @@ Keep your `CANVAS_API_TOKEN` confidential. Do not commit it to version control.
   Clone the repository
  
    ```bash
-   git clone https://github.com/mbcrosier/canvas-mcp.git
+   git clone https://github.com/mbcrosiersamuel/canvas-mcp.git
    cd canvas-mcp
    ```
 
